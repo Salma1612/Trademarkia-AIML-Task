@@ -1,100 +1,129 @@
 20 Newsgroups Semantic Search Engine
 A production-ready semantic search engine on the 20 Newsgroups dataset (~20k articles) with two-phase fuzzy clustering, a cluster-aware semantic cache, and an interactive FastAPI web UI. Supports natural language queries and fast semantic retrieval using embeddings and vector similarity.
 
-If you want, I can also write a slightly longer version with badges and key features that looks perfect for GitHub’s README starter. This will make your repo look polished for submissions. Do you want me to do that?
+# Semantic Search FastAPI Project
 
-readme text
+This project implements a **semantic search API** using **FastAPI**, **Sentence Transformers**, and **scikit-learn**. It allows querying a dataset using natural language and returns results based on semantic similarity.
 
-Here’s a full, professional README text you can use for your repository. It’s clean, original, and submission-ready:
+---
 
-20 Newsgroups — Semantic Search Engine
+## **Project Structure**
+semantic_project/
+├─ main.py # FastAPI app
+├─ engine.py # Query processing and search logic
+├─ precompute_embeddings.py # Precompute embeddings for the dataset
+├─ requirements.txt # Python dependencies
+├─ README.md
+├─ .gitignore
+└─ src/
+├─ init.py
+├─ embeddings.py # Model and precomputed embeddings
+└─ cache.py # Semantic cache implementation
 
-A production-ready semantic search engine built on the 20 Newsgroups dataset (~20k articles). This project implements two-phase clustering, a custom semantic cache, and an interactive FastAPI web interface for fast and accurate semantic search.
+---
 
-Features
+## **Installation**
 
-Semantic Search – Query the dataset using natural language, not just keywords.
+1. Clone the repository:
 
-Two-Phase Fuzzy Clustering – Organizes documents into semantic clusters for faster retrieval.
+```bash
+git clone <your-repo-url>
+cd semantic_project
 
-Cluster-Aware Semantic Cache – Reuses results from similar queries for instant responses.
+2.Create and activate a virtual environment:
+python -m venv venv
+# Windows
+.\venv\Scripts\activate
+# Mac/Linux
+source venv/bin/activate
 
-FastAPI Web UI – Interactive interface to explore search results and cache behavior.
-
-Vector Store – Uses ChromaDB for efficient embedding storage and cosine similarity search.
-
-Installation & Quick Start
-
-Clone the repository
-
-git clone <your-repo-link>
-cd <repo-folder>
-
-Install dependencies
-
-conda create -n semantic_env python=3.10
-conda activate semantic_env
+3.Install dependencies:
 pip install -r requirements.txt
 
-Run the pipeline (embedding + clustering + cache setup)
+4.Dataset
 
-python scripts/run_pipeline.py
+This project uses the 20 Newsgroups dataset from UCI Repository
 
-Start the API and UI
+DATASET LINK : https://archive.ics.uci.edu/dataset/113/twenty+newsgroups
 
-uvicorn src.api:app --host 0.0.0.0 --port 8000
+Note: The dataset is automatically downloaded when running precompute_embeddings.py.
 
-Open the UI in a browser
-http://localhost:8000
+5.Precompute Embeddings
+Before running the API, precompute embeddings for the dataset:
+python precompute_embeddings.py
+This may take a few minutes depending on your machine.
 
-Architecture & Design
+6.Running the API
 
-Embedding Model: all-MiniLM-L6-v2 (384-dim, fast and accurate embeddings)
+Start the FastAPI server:
+python -m uvicorn main:app --reload
 
-Vector Store: File-based ChromaDB with cosine similarity index
+The server will run at http://127.0.0.1:8000.
 
-Clustering: Two-phase fuzzy C-Means to improve retrieval speed and cache efficiency
+API documentation is available at http://127.0.0.1:8000/docs.
 
-Cache: JSON-based cluster-aware semantic cache with configurable similarity threshold
+API Endpoints
+1. POST /query
 
-API & UI: FastAPI backend with lightweight interactive web interface
+Request Body (JSON):
 
-Project Structure
-src/
-  data_pipeline.py       # Load, clean, embed, store in ChromaDB
-  clustering.py          # Two-phase fuzzy C-Means clustering
-  semantic_cache.py      # Cluster-aware semantic cache implementation
-  api.py                 # FastAPI service + interactive web UI
-  static/index.html      # Web UI
-scripts/
-  run_pipeline.py        # Master pipeline runner
-notebooks/
-  heuristic_analysis.ipynb  # Cache threshold analysis
-tests/
-  test_cache.py          # Semantic cache unit tests
-  test_api.py            # API integration tests
-Sample Queries
+{
+  "query": "machine learning applications"
+}
 
-Apple / Mac Hardware
+Response Example:
 
-“What is the word apple means?” → new cache entry
+{
+  "query": "machine learning applications",
+  "cache_hit": true,
+  "matched_query": "applications of machine learning",
+  "similarity_score": 0.91,
+  "result": "Relevant document content...",
+  "dominant_cluster": 3
+}
 
-“Macintosh display problems” → ⚡ CACHE HIT
+On a cache miss, the result is computed and stored in the semantic cache.
 
-Space / NASA
+2. GET /cache/stats
 
-“NASA space shuttle launch Mars mission” → new cache entry
+Response Example:
 
-“Space shuttle rocket NASA orbit” → ⚡ CACHE HIT
+{
+  "total_entries": 42,
+  "hit_count": 17,
+  "miss_count": 25,
+  "hit_rate": 0.405
+}
+3. DELETE /cache
 
-Different Intent (Boundary Case)
+Flush the cache entirely and reset all stats.
 
-“Commercial satellite launch SpaceX” → CACHE MISS
+Notes
 
-Learning Outcomes
+Do not push venv/ or compiled Python files (.pyc) to GitHub.
 
-End-to-end semantic search engine implementation
+Use requirements.txt to recreate the environment on any machine.
 
-Combining embeddings, vector databases, clustering, and caching for fast retrieval
+Make sure src/ folder contains all 3 modules (__init__.py, embeddings.py, cache.py) for the project to run.
 
-Production-ready Python API development and interactive web UI design
+Contact / Help
+
+For issues with deployment or API errors, please contact the project owner or refer to the documentation of FastAPI and Sentence Transformers.
+
+
+---
+
+This README covers:
+
+- Project structure  
+- Installation and setup  
+- Dataset info  
+- Precomputing embeddings  
+- API endpoints with example input/output  
+- Notes about `venv` and GitHub  
+
+---
+
+If you want, I can **also make a small “Live Deployment / Testing Instructions” section** so recruiters or anyone can test it on their machine quickly.  
+
+Do you want me to add that?nteractive web UI design
