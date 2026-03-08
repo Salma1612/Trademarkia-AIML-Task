@@ -1,61 +1,60 @@
 20 Newsgroups Semantic Search Engine
+
 A production-ready semantic search engine on the 20 Newsgroups dataset (~20k articles) with two-phase fuzzy clustering, a cluster-aware semantic cache, and an interactive FastAPI web UI. Supports natural language queries and fast semantic retrieval using embeddings and vector similarity.
 
-# Semantic Search FastAPI Project
+Semantic Search FastAPI Project
 
-This project implements a **semantic search API** using **FastAPI**, **Sentence Transformers**, and **scikit-learn**. It allows querying a dataset using natural language and returns results based on semantic similarity.
+This project implements a semantic search API using FastAPI, Sentence Transformers, and scikit-learn. It allows querying a dataset using natural language and returns results based on semantic similarity.
 
----
-
-## **Project Structure**
+Project Structure
 semantic_project/
-├─ main.py # FastAPI app
-├─ engine.py # Query processing and search logic
-├─ precompute_embeddings.py # Precompute embeddings for the dataset
-├─ requirements.txt # Python dependencies
+├─ main.py                   # FastAPI app
+├─ engine.py                 # Query processing and search logic
+├─ precompute_embeddings.py  # Precompute embeddings for the dataset
+├─ requirements.txt          # Python dependencies
 ├─ README.md
 ├─ .gitignore
 └─ src/
-├─ init.py
-├─ embeddings.py # Model and precomputed embeddings
-└─ cache.py # Semantic cache implementation
+   ├─ __init__.py
+   ├─ embeddings.py          # Model and precomputed embeddings
+   └─ cache.py               # Semantic cache implementation
+Installation
 
----
+Clone the repository:
 
-## **Installation**
-
-1. Clone the repository:
-
-```bash
 git clone <your-repo-url>
 cd semantic_project
 
-2.Create and activate a virtual environment:
+Create and activate a virtual environment:
+
 python -m venv venv
 # Windows
 .\venv\Scripts\activate
 # Mac/Linux
 source venv/bin/activate
 
-3.Install dependencies:
-pip install -r requirements.txt
+Install dependencies:
 
-4.Dataset
+pip install -r requirements.txt
+Dataset
 
 This project uses the 20 Newsgroups dataset from UCI Repository
-
-DATASET LINK : https://archive.ics.uci.edu/dataset/113/twenty+newsgroups
+.
 
 Note: The dataset is automatically downloaded when running precompute_embeddings.py.
 
-5.Precompute Embeddings
+Precompute Embeddings
+
 Before running the API, precompute embeddings for the dataset:
+
 python precompute_embeddings.py
+
 This may take a few minutes depending on your machine.
 
-6.Running the API
+Running the API
 
 Start the FastAPI server:
+
 python -m uvicorn main:app --reload
 
 The server will run at http://127.0.0.1:8000.
@@ -109,21 +108,3 @@ Make sure src/ folder contains all 3 modules (__init__.py, embeddings.py, cache.
 Contact / Help
 
 For issues with deployment or API errors, please contact the project owner or refer to the documentation of FastAPI and Sentence Transformers.
-
-
----
-
-This README covers:
-
-- Project structure  
-- Installation and setup  
-- Dataset info  
-- Precomputing embeddings  
-- API endpoints with example input/output  
-- Notes about `venv` and GitHub  
-
----
-
-If you want, I can **also make a small “Live Deployment / Testing Instructions” section** so recruiters or anyone can test it on their machine quickly.  
-
-Do you want me to add that?nteractive web UI design
