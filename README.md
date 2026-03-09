@@ -435,7 +435,22 @@ docker run -p 8000:8000 semantic-search-api
 ```
 
 ---
+## Docker Setup
 
+This project can be executed using Docker for a fully isolated environment.
+
+### Build and Start the Container
+
+```bash
+docker-compose up --build
+Access the API
+
+After the container starts, the FastAPI service will be available at:
+
+http://localhost:8000
+
+Stop the Container
+docker-compose down
 # Author
 
 **Sk Salma**  
