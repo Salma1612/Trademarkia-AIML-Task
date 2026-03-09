@@ -1,4 +1,4 @@
-# Cluster-Aware Semantic Search System
+# Trademarkia Sematic Search with Cluster-Aware Semantic Search System
 
 ## Project Overview
 
