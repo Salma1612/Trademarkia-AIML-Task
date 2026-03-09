@@ -1,65 +1,270 @@
-**20 Newsgroups — Semantic Search Engine**
+Trademarkia Semantic Search with Cluster-Aware Semantic Cache
+Project Overview
 
-Trademarkia AI/ML Engineer Task | Built by Shaik Salma
+This project implements a semantic search system built using modern Natural Language Processing (NLP) and vector similarity search techniques.
 
-A production-ready semantic search engine on the 20 Newsgroups dataset (~20k articles). Includes two-phase fuzzy clustering, a custom cluster-aware semantic cache, and an interactive FastAPI web UI. Supports natural language queries and fast semantic retrieval using embeddings and vector similarity.
+The system retrieves relevant documents using Sentence Embeddings, FAISS Vector Indexing, Fuzzy Clustering, and a custom semantic caching layer.
 
-**⚡ Quick Start**(Recommended)
+The search system is exposed through a FastAPI service, allowing users to query the corpus using natural language queries.
 
-**1.Clone the repository**
-git clone <your-repo-url>
-cd semantic_project
+During development, the API was temporarily exposed using ngrok public tunnels to allow external access and testing.
 
-**2.Create & activate a virtual environment**
-python -m venv venv
-# Windows
-.\venv\Scripts\activate
-# Mac/Linux
-source venv/bin/activate
+This project follows the architecture specified in the Trademarkia AI/ML Engineer Task and demonstrates how clustering, vector search, and semantic caching can work together in a scalable semantic retrieval system.
 
-**3.Install dependencies**
-pip install -r requirements.txt
+System Architecture
 
-**4.Dataset**
-This project uses the 20 Newsgroups dataset from UCI Repository:
-20 Newsgroups Dataset
+User Query
+→ Query Embedding Generation
+→ Cluster Prediction (Fuzzy C-Means)
+→ Semantic Cache Lookup
+→ FAISS Vector Search (on cache miss)
+→ Retrieve Top Documents
+→ Store Result in Semantic Cache
+→ Return Response via FastAPI
 
-⚡ Note: The dataset is automatically downloaded when running precompute_embeddings.py.
+Repository Structure
+trademarkia-semantic-search/
 
-**5.Precompute Embeddings**
-Before running the API, precompute embeddings for the dataset:
-python precompute_embeddings.py
-⚡ This may take a few minutes depending on your machine.
+app/
+│
+├── __init__.py
+├── app.py  → Main FastAPI service implementation
+│
+└── utils/
+    ├── __init__.py
+    ├── engine.py → Query processing and semantic search logic
+    ├── embeddings.py → Sentence Transformer embedding utilities
+    ├── cache.py → Semantic cache implementation
+    └── precompute_embeddings.py → Script to generate document embeddings
 
-**6.Run the API**
-python -m uvicorn main:app --reload
-The server will run at: http://127.0.0.1:8000
+data/
+│
+├── raw/
+│   └── .gitkeep
+│
+├── processed/
+│   └── .gitkeep
+│
+└── artifacts/
+    └── .gitkeep
 
-API docs (Swagger UI): http://127.0.0.1:8000/docs
+notebooks/
+│
+└── pipeline.ipynb → End-to-end experimentation notebook
 
-**🧪 API Endpoints**
-**1. POST /query**
+Other files
 
-Request Body (JSON):
+requirements.txt → Python dependencies  
+.gitignore  
+README.md
+Complete System Pipeline
+
+This section explains the end-to-end machine learning pipeline implemented in this project.
+
+1. Dataset Collection
+
+The dataset used in this project is the 20 Newsgroups Dataset, obtained from the UCI Machine Learning Repository.
+
+The dataset contains approximately 20,000 news articles across 20 discussion categories.
+
+Example categories include:
+
+Politics
+
+Religion
+
+Sports
+
+Computer Hardware
+
+Space
+
+Firearms
+
+The dataset is distributed as a compressed archive of raw text documents, which must be parsed and structured before further processing.
+
+2. Data Preprocessing
+
+The raw dataset contains several types of noise and irrelevant metadata, including:
+
+Email headers
+
+Formatting artifacts
+
+Punctuation
+
+Stopwords
+
+To improve the quality of the downstream semantic representations, a text preprocessing pipeline was implemented.
+
+Preprocessing Steps
+
+The following transformations were applied:
+
+• Lowercasing
+• Punctuation removal
+• Stopword removal
+• Metadata stripping
+• Whitespace normalization
+
+Generated Intermediate Files
+
+The preprocessing pipeline produces several intermediate datasets:
+
+raw_documents.csv → structured version of the original dataset
+cleaned_documents.csv → cleaned textual content
+filtered_documents.csv → final dataset after noise filtering
+
+Documents that were too short, noisy, or semantically weak were removed to ensure high-quality embeddings.
+
+3. Document Embedding Generation
+
+To enable semantic similarity search, each document is converted into a dense vector embedding.
+
+Embedding Model
+
+Sentence Transformers
+
+Model used:
+
+all-MiniLM-L6-v2
+
+Library:
+
+sentence-transformers
+
+Embedding dimension:
+
+384-dimensional vector representation
+
+This model converts each document into a semantic vector representation capturing contextual meaning rather than simple keyword presence.
+
+4. Vector Database using FAISS
+
+To efficiently search across thousands of embeddings, a vector similarity index is built using FAISS (Facebook AI Similarity Search).
+
+Technology Used
+
+FAISS Vector Database
+
+Index Type
+
+Flat L2 Index
+
+FAISS enables fast nearest-neighbour search across high-dimensional embeddings.
+
+When a query embedding is generated, FAISS retrieves the most semantically similar documents.
+
+5. Fuzzy Clustering of Documents
+
+Real-world documents often belong to multiple semantic topics simultaneously.
+
+For example:
+
+A document discussing gun legislation may relate to both politics and firearms.
+
+Therefore, traditional hard clustering algorithms such as K-Means are not suitable.
+
+Instead, this project uses Fuzzy C-Means Clustering.
+
+Algorithm Used
+
+Fuzzy C-Means
+
+Library used:
+
+scikit-fuzzy
+
+Key Concept
+
+Instead of assigning each document to a single cluster, Fuzzy C-Means assigns membership probabilities.
+
+Example:
+
+Document A →
+Cluster 1 → 0.2
+Cluster 3 → 0.7
+Cluster 7 → 0.1
+
+This allows documents to belong partially to multiple clusters, which better reflects real semantic relationships.
+
+6. Semantic Cache Design
+
+Traditional caches fail when queries are phrased differently but have the same meaning.
+
+Example:
+
+"How do graphics cards work?"
+vs
+"Explain GPU architecture"
+
+A keyword-based cache would treat these as different queries.
+
+To solve this, the project implements a semantic cache from first principles.
+
+Core Idea
+
+Queries are compared using embedding similarity instead of exact string matching.
+
+Cache Workflow
+
+When a query arrives:
+
+The query is converted into a vector embedding
+
+The system checks similarity against previous cached query embeddings
+
+If similarity exceeds a predefined threshold, it becomes a cache hit
+
+Otherwise the system performs a FAISS vector search
+
+The result is then stored in the semantic cache.
+
+Cache Metrics
+
+The system tracks:
+
+Total entries
+
+Cache hits
+
+Cache misses
+
+Hit rate
+
+7. FastAPI Service
+
+The search system is exposed as a REST API using FastAPI.
+
+Framework
+
+FastAPI
+
+ASGI Server
+
+Uvicorn
+
+Implemented Endpoints
+
+POST /query
+
+Example Response:
+
 {
-  "query": "machine learning applications"
-}
-Response Example:
-</>JSON
-{
-  "query": "machine learning applications",
+  "query": "...",
   "cache_hit": true,
-  "matched_query": "applications of machine learning",
+  "matched_query": "...",
   "similarity_score": 0.91,
-  "result": "Relevant document content...",
+  "result": "...",
   "dominant_cluster": 3
 }
-On a cache miss, the result is computed and stored in the semantic cache.
 
-**2. GET /cache/stats**
+GET /cache/stats
 
-Response Example:
-</>JSON
+Returns semantic cache statistics.
+
+Example:
+
 {
   "total_entries": 42,
   "hit_count": 17,
@@ -67,63 +272,29 @@ Response Example:
   "hit_rate": 0.405
 }
 
-**3. DELETE /cache**
+DELETE /cache
 
-Flush the cache entirely and reset all stats.
+Clears cache entries and statistics.
 
-**📂 Project Structure**
-semantic_project/
-├─ main.py                  # FastAPI app
-├─ engine.py                # Query processing & search logic
-├─ precompute_embeddings.py # Precompute embeddings for the dataset
-├─ requirements.txt         # Python dependencies
-├─ README.md
-├─ .gitignore
-└─ src/
-   ├─ __init__.py
-   ├─ embeddings.py         # Model & precomputed embeddings
-   └─ cache.py              # Semantic cache implementation
+Running the Project
 
-**🧠 Architecture & Design Decisions**
-| Decision          | Choice                  | Rationale                                                          |
-| ----------------- | ----------------------- | ------------------------------------------------------------------ |
-| Embedding model   | all-MiniLM-L6-v2        | 384-dim, purpose-built for retrieval, ~3× faster than large models |
-| Vector store      | ChromaDB                | File-backed, zero infra, cosine HNSW index                         |
-| Clustering        | Two-phase FCM           | Sample 5k → fit centers → predict on all 14k                       |
-| Cluster count     | k=13 (silhouette)       | Avoids assuming 20 labels = true semantic structure                |
-| Cache lookup      | Cluster-bucketed cosine | O(N/k) vs O(N) — ~13× speedup as cache grows                       |
-| Cache threshold   | 0.80                    | Rephrasings match, dissimilar queries separate cleanly             |
-| Cache persistence | Pure JSON               | No Redis, no SQLite — built from scratch                           |
-| State management  | app.state singleton     | Single model + cache instance, no race conditions                  |
+Install dependencies:
 
+pip install -r requirements.txt
 
-**🧪 Sample Queries to Test the Semantic Cache**
+Start the API server:
 
-Try these query pairs in the UI to see cache behavior:
+uvicorn app.app:app --host 0.0.0.0 --port 8000
 
-Pair 1 — Apple / Mac Hardware
+Open API documentation:
 
-what is the word apple means → hits the corpus (~300ms)
+http://localhost:8000/docs
 
-Macintosh display problems → ⚡ CACHE HIT (same semantic cluster, <1ms)
+Author
 
-Pair 2 — Space / NASA
+Shaik Salma
+23BCE20344
+B.Tech Computer Science (AI & ML)
+Pre-Final Year Student
+VIT-AP University
 
-NASA space shuttle launch Mars mission → new cache entry
-
-space shuttle rocket NASA orbit → ⚡ CACHE HIT
-
-Pair 3 — Threshold boundary (should MISS)
-
-commercial satellite launch SpaceX → CACHE MISS (different intent, demonstrates 0.80 threshold heuristic)
-
-**⚠️ Notes**
-
-Do not push venv/ or compiled Python files (.pyc) to GitHub.
-
-Use requirements.txt to recreate the environment on any machine.
-
-Ensure src/ folder contains all 3 modules (__init__.py, embeddings.py, cache.py) for the project to run.
-
-Precompute embeddings once before starting the API.
-   
